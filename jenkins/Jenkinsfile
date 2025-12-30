@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out source code...'
-                // git url: 'https://github.com/your-repo/app.git'
+                 git url: 'https://github.com/humeshdeshmukh/primine-tasks.git'
                 checkout scm
             }
         }

@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        ECR_REGISTRY = '123456789012.dkr.ecr.us-east-1.amazonaws.com'
+        APP_NAME = 'my-simulated-app'
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                // git url: 'https://github.com/your-repo/app.git'
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                dir('app') {
+                    echo 'Installing dependencies and running tests...'
+                    sh 'npm install && npm test'
+                    echo 'Simulated: passed.'
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                echo 'Running Trivy security scan...'
+                // sh 'trivy fs .'
+                echo 'Simulated: No high-severity vulnerabilities found.'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('app') {
+                    echo "Building Docker image ${APP_NAME}:${IMAGE_TAG}..."
+                    // sh "docker build -t ${APP_NAME}:${IMAGE_TAG} ."
+                    echo 'Simulated: Docker build successful.'
+                }
+            }
+        }
+
+        stage('Push to ECR') {
+            steps {
+                echo 'Logging into ECR...'
+                // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                echo 'Pushing image to ECR...'
+                // sh "docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${APP_NAME}:${IMAGE_TAG}"
+                // sh "docker push ${ECR_REGISTRY}/${APP_NAME}:${IMAGE_TAG}"
+                echo 'Simulated: Image pushed to ECR successfully.'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir('terraform') {
+                    echo 'Initializing Terraform...'
+                    // sh 'terraform init'
+                    echo 'Running Terraform Plan...'
+                    // sh 'terraform plan'
+                    echo 'Simulated: Infrastructure plan validated.'
+                }
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input message: "Approve Production Deployment (Blue/Green)?", ok: "Deploy"
+            }
+        }
+
+        stage('Deploy (Blue-Green)') {
+            steps {
+                echo 'Triggering Blue-Green Deployment...'
+                // script {
+                //      sh "./scripts/deploy.sh ${APP_NAME} ${IMAGE_TAG}"
+                // }
+                echo 'Simulated: Deployment verified. Traffic switched to Green.'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+        success {
+            echo 'Sending success notification (Slack/Email)...'
+        }
+        failure {
+            echo 'Sending failure alert...'
+        }
+    }
+}

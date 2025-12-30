@@ -1,0 +1,12 @@
+{
+  "name": "simulation-app",
+  "version": "1.0.0",
+  "description": "App for CI/CD Simulation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "author": "Candidate",
+  "license": "ISC"
+}

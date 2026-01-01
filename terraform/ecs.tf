@@ -27,14 +27,13 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = aws_secretsmanager_secret.app_secrets.arn
         }
       ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.app_logs.name
-          "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
+      # Overwriting default Nginx page to simulate our custom app
+      command = [
+        "/bin/sh",
+        "-c",
+        "echo '<h1 style=\"color:blue;\">Hello Senior! This is the Blue/Green Simulation App.</h1><p>Deployed via Terraform on AWS ECS Fargate.</p>' > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"
+      ]
+      # logConfiguration removed due to Playground permissions
     },
     {
       name  = "datadog-agent"
@@ -51,14 +50,7 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = aws_secretsmanager_secret.app_secrets.arn
         }
       ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.app_logs.name
-          "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
+      # logConfiguration removed due to Playground permissions
     }
   ])
 }
@@ -125,14 +117,6 @@ resource "aws_iam_role_policy" "secrets_access" {
         Resource = [
           aws_secretsmanager_secret.app_secrets.arn
         ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "*"
       }
     ]
   })
